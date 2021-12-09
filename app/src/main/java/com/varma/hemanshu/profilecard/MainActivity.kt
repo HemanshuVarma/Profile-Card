@@ -81,14 +81,14 @@ fun ProfileCard(userProfile: UserProfile) {
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ProfilePicture(userProfile.drawableId, userProfile.onlineStatus)
+            ProfilePicture(userProfile.pictureURL, userProfile.onlineStatus)
             ProfileContent(userProfile.userName, userProfile.onlineStatus)
         }
     }
 }
 
 @Composable
-fun ProfilePicture(userProfileImage: Int, userStatus: Boolean) {
+fun ProfilePicture(userProfileImageURL: String, userStatus: Boolean) {
     Card(
         shape = CircleShape,
         border = BorderStroke(
@@ -100,7 +100,7 @@ fun ProfilePicture(userProfileImage: Int, userStatus: Boolean) {
     ) {
         Image(
             painter = rememberImagePainter(
-                data = userProfileImage,
+                data = userProfileImageURL,
                 builder = {
                     // To evenly crop images
                     transformations(CircleCropTransformation())
