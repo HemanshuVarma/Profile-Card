@@ -17,10 +17,10 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberImagePainter
+import coil.transform.CircleCropTransformation
 import com.varma.hemanshu.profilecard.data.UserProfile
 import com.varma.hemanshu.profilecard.data.userProfileList
 import com.varma.hemanshu.profilecard.ui.theme.ProfileCardTheme
@@ -99,10 +99,14 @@ fun ProfilePicture(userProfileImage: Int, userStatus: Boolean) {
         elevation = 4.dp
     ) {
         Image(
-            painter = painterResource(id = userProfileImage),
-            contentDescription = "Profile Image",
+            painter = rememberImagePainter(
+                data = userProfileImage,
+                builder = {
+                    // To evenly crop images
+                    transformations(CircleCropTransformation())
+                }),
             modifier = Modifier.size(72.dp),
-            contentScale = ContentScale.Crop
+            contentDescription = "Profile Image"
         )
     }
 }
