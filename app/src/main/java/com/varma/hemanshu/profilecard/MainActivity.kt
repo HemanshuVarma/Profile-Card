@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
@@ -31,14 +32,14 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ProfileCardTheme {
-                MainScreen()
+                UserListsScreen()
             }
         }
     }
 }
 
 @Composable
-fun MainScreen(userProfiles: List<UserProfile> = userProfileList) {
+fun UserListsScreen(userProfiles: List<UserProfile> = userProfileList) {
     Scaffold(topBar = { AppBar() }) {
         Surface(
             modifier = Modifier.fillMaxSize()
@@ -47,6 +48,30 @@ fun MainScreen(userProfiles: List<UserProfile> = userProfileList) {
                 items(userProfiles) { userProfile ->
                     ProfileCard(userProfile = userProfile)
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun UserDetailScreen(userProfile: UserProfile = userProfileList[0]) {
+    Scaffold(topBar = { AppBar() }) {
+        Surface(
+            modifier = Modifier.fillMaxSize()
+        ) {
+//            ProfileCard(userProfile = userProfile)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
+            ) {
+                ProfilePicture(userProfile.pictureURL, userProfile.onlineStatus, 240.dp)
+                ProfileContent(
+                    userProfile.userName,
+                    userProfile.onlineStatus,
+                    Alignment.CenterHorizontally
+                )
             }
         }
     }
@@ -81,14 +106,14 @@ fun ProfileCard(userProfile: UserProfile) {
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ProfilePicture(userProfile.pictureURL, userProfile.onlineStatus)
-            ProfileContent(userProfile.userName, userProfile.onlineStatus)
+            ProfilePicture(userProfile.pictureURL, userProfile.onlineStatus, 72.dp)
+            ProfileContent(userProfile.userName, userProfile.onlineStatus, Alignment.Start)
         }
     }
 }
 
 @Composable
-fun ProfilePicture(userProfileImageURL: String, userStatus: Boolean) {
+fun ProfilePicture(userProfileImageURL: String, userStatus: Boolean, imageSize: Dp) {
     Card(
         shape = CircleShape,
         border = BorderStroke(
@@ -105,18 +130,18 @@ fun ProfilePicture(userProfileImageURL: String, userStatus: Boolean) {
                     // To evenly crop images
                     transformations(CircleCropTransformation())
                 }),
-            modifier = Modifier.size(72.dp),
+            modifier = Modifier.size(imageSize),
             contentDescription = "Profile Image"
         )
     }
 }
 
 @Composable
-fun ProfileContent(userName: String, online: Boolean) {
+fun ProfileContent(userName: String, online: Boolean, alignment: Alignment.Horizontal) {
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
+            .padding(8.dp),
+        horizontalAlignment = alignment
     ) {
         //Controlling TEXT Alpha based on user status
         CompositionLocalProvider(LocalContentAlpha provides if (online) 1f else ContentAlpha.medium) {
@@ -138,8 +163,16 @@ fun ProfileContent(userName: String, online: Boolean) {
 
 @Preview(showBackground = true)
 @Composable
-fun DefaultPreview() {
+fun UserListsScreenPreview() {
     ProfileCardTheme {
-        MainScreen()
+        UserListsScreen()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun UserDetailScreenPreview() {
+    ProfileCardTheme {
+        UserDetailScreen()
     }
 }
