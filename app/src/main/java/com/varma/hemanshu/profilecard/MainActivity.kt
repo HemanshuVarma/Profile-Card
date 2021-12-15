@@ -12,12 +12,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -58,14 +60,18 @@ fun UserApplication(userProfiles: List<UserProfile> = userProfileList) {
                 type = NavType.IntType
             })
         ) { navBackStackEntry ->
-            UserDetailScreen(navBackStackEntry.arguments!!.getInt("userId"))
+            UserDetailScreen(navBackStackEntry.arguments!!.getInt("userId"), navController)
         }
     }
 }
 
 @Composable
 fun UserListsScreen(userProfiles: List<UserProfile>, navController: NavController?) {
-    Scaffold(topBar = { AppBar() }) {
+    Scaffold(topBar = {
+        AppBar(title = "Users List", icon = Icons.Default.Home) {
+            // Do nothing on icon click
+        }
+    }) {
         Surface(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -81,9 +87,13 @@ fun UserListsScreen(userProfiles: List<UserProfile>, navController: NavControlle
 }
 
 @Composable
-fun UserDetailScreen(userId: Int) {
+fun UserDetailScreen(userId: Int, navController: NavController?) {
     val userProfile = userProfileList.first { userProfile -> userId == userProfile.id }
-    Scaffold(topBar = { AppBar() }) {
+    Scaffold(topBar = {
+        AppBar(title = "User Details", icon = Icons.Default.ArrowBack) {
+            navController?.navigateUp()
+        }
+    }) {
         Surface(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -105,15 +115,17 @@ fun UserDetailScreen(userId: Int) {
 }
 
 @Composable
-fun AppBar() {
+fun AppBar(title: String, icon: ImageVector, iconClickCallback: () -> Unit) {
     TopAppBar(
         navigationIcon = {
             Icon(
-                Icons.Default.Home,
-                modifier = Modifier.padding(horizontal = 12.dp),
-                contentDescription = "Home icon"
+                icon,
+                modifier = Modifier
+                    .padding(horizontal = 12.dp)
+                    .clickable(onClick = { iconClickCallback.invoke() }),
+                contentDescription = "AppBar icon"
             )
-        }, title = { Text(text = "Profile Card") }
+        }, title = { Text(text = title) }
     )
 }
 
@@ -201,6 +213,6 @@ fun UserListsScreenPreview() {
 @Composable
 fun UserDetailScreenPreview() {
     ProfileCardTheme {
-        UserDetailScreen(userId = 0)
+        UserDetailScreen(userId = 0, null)
     }
 }
