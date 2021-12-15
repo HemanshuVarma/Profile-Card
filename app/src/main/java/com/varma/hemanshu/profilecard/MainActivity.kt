@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,6 +21,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import com.varma.hemanshu.profilecard.data.UserProfile
@@ -32,21 +37,36 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ProfileCardTheme {
-                UserListsScreen()
+                UserApplication()
             }
         }
     }
 }
 
 @Composable
-fun UserListsScreen(userProfiles: List<UserProfile> = userProfileList) {
+fun UserApplication(userProfiles: List<UserProfile> = userProfileList) {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "users_list") {
+        composable("users_list") {
+            UserListsScreen(userProfiles = userProfiles, navController = navController)
+        }
+        composable("user_details") {
+            UserDetailScreen()
+        }
+    }
+}
+
+@Composable
+fun UserListsScreen(userProfiles: List<UserProfile>, navController: NavController?) {
     Scaffold(topBar = { AppBar() }) {
         Surface(
             modifier = Modifier.fillMaxSize()
         ) {
             LazyColumn {
                 items(userProfiles) { userProfile ->
-                    ProfileCard(userProfile = userProfile)
+                    ProfileCard(userProfile = userProfile) {
+                        navController?.navigate("user_details")
+                    }
                 }
             }
         }
@@ -59,7 +79,6 @@ fun UserDetailScreen(userProfile: UserProfile = userProfileList[0]) {
         Surface(
             modifier = Modifier.fillMaxSize()
         ) {
-//            ProfileCard(userProfile = userProfile)
             Column(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -91,12 +110,13 @@ fun AppBar() {
 }
 
 @Composable
-fun ProfileCard(userProfile: UserProfile) {
+fun ProfileCard(userProfile: UserProfile, clickCallback: () -> Unit) {
     Card(
         modifier = Modifier
             .padding(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 8.dp)
             .fillMaxWidth()
-            .wrapContentHeight(align = Alignment.Top),
+            .wrapContentHeight(align = Alignment.Top)
+            .clickable(onClick = { clickCallback.invoke() }),
         elevation = 8.dp,
         backgroundColor = Color.White
     ) {
@@ -165,7 +185,7 @@ fun ProfileContent(userName: String, online: Boolean, alignment: Alignment.Horiz
 @Composable
 fun UserListsScreenPreview() {
     ProfileCardTheme {
-        UserListsScreen()
+        UserListsScreen(userProfiles = userProfileList, null)
     }
 }
 
